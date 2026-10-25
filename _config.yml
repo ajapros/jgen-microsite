@@ -1,0 +1,41 @@
+# ============================================================
+#  JGen — Chenile's code generator (documentation microsite)
+#  GitHub Pages ready. Build locally with:  bundle exec jekyll serve
+# ============================================================
+
+title: "JGen — Chenile's code generator"
+tagline: "Generate Chenile projects — and write your own blueprints."
+description: >-
+  JGen is the pure-Java, blueprint-driven code generator for the Chenile
+  ecosystem. It ships a generation engine, a CLI, and a library of blueprints,
+  and lets you author your own with template conventions, declarative input
+  validation, and composable and aggregated blueprints.
+author: "Ajapro Software Private Limited"
+email: raja@ajapros.com
+
+url: "https://jgen.chenile.org"
+baseurl: ""
+
+chenile_docs: "https://chenile.org"
+github_repo: "https://github.com/rajakolluru/chenile-gen"
+chenile_version: "2.1.35"
+
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+defaults:
+  - scope: { path: "pages" }
+    values: { layout: "doc" }
+  - scope: { path: "" }
+    values: { layout: "doc" }
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - DEPLOY.md
+  - vendor
+  - .idea

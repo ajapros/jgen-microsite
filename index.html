@@ -1,0 +1,74 @@
+---
+layout: default
+title: "JGen — Chenile's code generator"
+permalink: /
+---
+<section class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">Chenile code generator</p>
+    <h1>Generate Chenile projects.<br><span class="amber">Then write your own blueprints.</span></h1>
+    <p class="lead">JGen is a pure-Java, blueprint-driven code generator. A shared engine copies a blueprint's
+      template tree, renders it, and runs the blueprint's hooks — turning a short JSON input into a ready-to-build
+      Chenile project. Fourteen blueprints ship in the box, and the same conventions let you author your own.</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="{{ '/install/' | relative_url }}">Install &amp; run</a>
+      <a class="btn btn-light" href="{{ '/authoring/' | relative_url }}">Write a blueprint</a>
+    </div>
+    <p class="hero-meta">Targets Chenile {{ site.chenile_version }} · Apache-licensed · rajakolluru/chenile-gen</p>
+  </div>
+</section>
+
+<section class="home-section">
+  <h2>What you get</h2>
+  <p class="sub">One engine, one CLI, a library of blueprints — and an authoring model that is almost entirely data.</p>
+  <div class="feature-grid">
+    <div class="feature">
+      <p class="fi">jgen -g · -f</p>
+      <h3>A predictable CLI</h3>
+      <p>Emit a sample input file for any blueprint, edit it, and generate. Interactive and non-interactive flows
+         share the same validation and pipeline.</p>
+    </div>
+    <div class="feature">
+      <p class="fi">14 blueprints</p>
+      <h3>Services to full deployments</h3>
+      <p>Services, headless services, workflow services, mini-monoliths, ecosystems, query modules, process
+         server/worker deployments, interceptors, integration tests — and a blueprint that scaffolds blueprints.</p>
+    </div>
+    <div class="feature">
+      <p class="fi">templates</p>
+      <h3>Author by convention</h3>
+      <p>Mustache files, <code>__name__</code> path placeholders, <code>%%key=value%%</code> conditional folders
+         and <code>.filelist</code> multi-file outputs. Most behaviour lives in templates, not Java.</p>
+    </div>
+    <div class="feature">
+      <p class="fi">validation</p>
+      <h3>Declarative input rules</h3>
+      <p>Fields declare rules like <code>JAVA_IDENTIFIER</code> or <code>KAFKA_TOPIC</code>, enforced across CLI,
+         portal and composed inputs before any file is written.</p>
+    </div>
+    <div class="feature">
+      <p class="fi">super_pom</p>
+      <h3>Composable</h3>
+      <p>Every blueprint accepts an optional parent POM and extra dependencies, so generated projects slot under a
+         shared Maven reactor without template edits.</p>
+    </div>
+    <div class="feature">
+      <p class="fi">%{{ ... }}</p>
+      <h3>Aggregated</h3>
+      <p>A blueprint can invoke other blueprints through marker folders — once, conditionally, or once per element
+         of a list — to compose whole multi-module applications.</p>
+    </div>
+  </div>
+</section>
+
+<section class="home-section" style="background:var(--soft);border-radius:var(--radius);">
+  <h2>Thirty seconds to a service</h2>
+  <p class="sub">Build the CLI, emit an input contract, edit it, generate.</p>
+  <pre><code>git clone https://github.com/rajakolluru/chenile-gen.git &amp;&amp; cd chenile-gen
+make clean all &amp;&amp; source setpath.sh        # puts jgen on PATH
+
+jgen -g chenile-service -o orders.json       # emit a sample input
+# edit orders.json: set service=orders, jpa=y ...
+jgen -f orders.json                          # generate ./output/orders</code></pre>
+  <p style="margin:0"><a class="btn btn-primary" href="{{ '/overview/' | relative_url }}">How it works →</a></p>
+</section>

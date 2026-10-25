@@ -1,0 +1,32 @@
+---
+layout: default
+---
+<div class="docwrap">
+  <aside class="docside" aria-label="Documentation navigation">
+    <button class="docside-toggle" aria-label="Toggle menu">☰ Contents</button>
+    <nav class="docside-nav">
+      {% for group in site.data.docsnav %}
+      <div class="docside-group">
+        <div class="docside-title">{{ group.section }}</div>
+        <ul>
+          {% for item in group.items %}
+          <li><a href="{{ item.url | relative_url }}"{% if page.url == item.url %} class="active" aria-current="page"{% endif %}>{{ item.title }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endfor %}
+    </nav>
+  </aside>
+  <article class="doccontent">
+    {% if page.eyebrow %}<p class="doc-eyebrow">{{ page.eyebrow }}</p>{% endif %}
+    {% if page.title %}<h1 class="doc-h1">{{ page.title }}</h1>{% endif %}
+    {% if page.summary %}<p class="doc-lead">{{ page.summary }}</p>{% endif %}
+    {{ content }}
+  </article>
+</div>
+<script>
+(function(){
+  var t=document.querySelector('.docside-toggle'),n=document.querySelector('.docside-nav');
+  if(t&&n)t.addEventListener('click',function(){n.classList.toggle('open');});
+})();
+</script>

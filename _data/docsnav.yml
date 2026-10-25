@@ -1,0 +1,30 @@
+- section: "Getting started"
+  items:
+    - title: "Home"
+      url: "/"
+    - title: "Overview &amp; architecture"
+      url: "/overview/"
+    - title: "Install &amp; the CLI"
+      url: "/install/"
+    - title: "Configuration &amp; versions"
+      url: "/configuration/"
+
+- section: "Blueprints"
+  items:
+    - title: "Blueprint catalogue"
+      url: "/blueprints/"
+
+- section: "Authoring blueprints"
+  items:
+    - title: "Template reference"
+      url: "/template-conventions/"
+    - title: "Generation pipeline"
+      url: "/pipeline/"
+    - title: "Write your own blueprint"
+      url: "/authoring/"
+    - title: "Declarative input validation"
+      url: "/input-validation/"
+    - title: "Composable blueprints"
+      url: "/composable-blueprints/"
+    - title: "Aggregated blueprints"
+      url: "/aggregated-blueprints/"
