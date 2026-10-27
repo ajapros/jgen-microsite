@@ -28,6 +28,8 @@ Generated projects build with `mvn install` (or `make build`); generated mini-mo
 | `-f, --input-file` | Read blueprint inputs from a JSON file (non-interactive). |
 | `-g, --generate-blueprint-file` | Emit a sample input JSON for a named blueprint. |
 | `-o, --output-file` | Where to write the sample input JSON. |
+| `-r, --regenerate` | Re-cut a generated project with the current blueprint into a separate folder and classify every file (2.1.35; see [Regeneration](/regeneration/)). |
+| `--into` | With `-r`, the folder to regenerate into (default `<project>.regenerated`). |
 
 There are three ways to drive JGen.
 

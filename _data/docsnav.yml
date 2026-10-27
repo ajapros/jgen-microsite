@@ -10,6 +10,8 @@
       url: "/install/"
     - title: "Configuration &amp; versions"
       url: "/configuration/"
+    - title: "Regeneration (alterations)"
+      url: "/regeneration/"
 
 - section: "Blueprints"
   items:
