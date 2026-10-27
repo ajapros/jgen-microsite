@@ -4,6 +4,8 @@
       url: "/"
     - title: "Overview &amp; architecture"
       url: "/overview/"
+    - title: "Why JGen? (comparison)"
+      url: "/why-jgen/"
     - title: "Install &amp; the CLI"
       url: "/install/"
     - title: "Configuration &amp; versions"
