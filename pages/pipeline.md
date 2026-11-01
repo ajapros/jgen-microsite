@@ -36,13 +36,13 @@ The `processors` flow runs these processors, in this sequence:
 | 8–10 | `path-tag-processor` | Applies the [path tags](/template-conventions/#path-tags-and-adding-your-own) to file and folder names, one pass per tag, in order: |
 | 8 | ↳ `filelist` | Breaks every `.filelist` file into multiple files. |
 | 9 | ↳ `placeholder` | Replaces `__name__` placeholders in file and folder names from the map. |
-| 9a | ↳ `dot` | (2.1.36) Turns every `_DoT_` in file and folder names into a dot: `_DoT_gitignore` becomes `.gitignore` (see [Template reference](/template-conventions/#_dot_--dots-in-names)). |
+| 9a | ↳ `dot` | (2.5.1) Turns every `_DoT_` in file and folder names into a dot: `_DoT_gitignore` becomes `.gitignore` (see [Template reference](/template-conventions/#_dot_--dots-in-names)). |
 | 10 | ↳ `conditional` | Processes `%%key=value%%` folders: promote on match, discard otherwise. |
-| | ↳ *extension tags* | (2.1.36) Tags added by extension jars run at the position their `order` gives them. |
+| | ↳ *extension tags* | (2.5.1) Tags added by extension jars run at the position their `order` gives them. |
 | 11 | `blueprint-expander` | Expands surviving child markers ({% raw %}`%{{…}}`{% endraw %}) through their own pipelines — see [Aggregated blueprints](/aggregated-blueprints/). |
 | 12 | `post-process-executor` | Runs the blueprint's **post-process hook** for custom destination-folder logic, after all children. |
 | 13 | `provenance-writer` | Writes `.jgen/generation.json`: blueprint, config, inputs and a hash of every generated file. Top-level generations only. |
-| 14 | `git-initializer` | (2.1.36) With `initGit` true: makes the project a local Git repository with one commit, and adds the blueprint's `gitRepositoryField` value as `origin` (see [Generating a Git repository](/authoring/#generating-a-git-repository-initgit)). Top-level generations only. |
+| 14 | `git-initializer` | (2.5.1) With `initGit` true: makes the project a local Git repository with one commit, and adds the blueprint's `gitRepositoryField` value as `origin` (see [Generating a Git repository](/authoring/#generating-a-git-repository-initgit)). Top-level generations only. |
 | 15 | `final-executor` | Runs the blueprint's **final hook**, last: for work outside the file tree. Top-level generations only. |
 
 > The engine resolves config, then validates version, then validates inputs — all **before** the init hook runs

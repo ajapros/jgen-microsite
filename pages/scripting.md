@@ -5,7 +5,7 @@ permalink: /scripting/
 summary: "Write a blueprint's hooks in JavaScript instead of Java. Scripts run in a sandbox, need no build, and work in template-only blueprints."
 ---
 
-<span class="pill">2.1.36</span>
+<span class="pill">2.5.1</span>
 
 A blueprint's hooks compute derived values, shape the inputs of child blueprints and tidy the generated files.
 Until now they were Java, so a blueprint with any logic needed a build and a jar. Hooks can now also be

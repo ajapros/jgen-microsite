@@ -33,7 +33,8 @@ Download `jgen-<version>.zip` from the
 folder to your PATH. It contains `bin/jgen` (and `bin/jgen.cmd` for Windows), `lib/jgen-cli.jar` and an empty
 `blueprints/` folder.
 
-Check the installation with `jgen --version`.
+Check the installation with `jgen --version`. It shows JGen's own version and the Chenile version generated projects
+target by default (see [Releases & versions](/releases/)).
 
 **Tab completion.** Homebrew sets up completion for bash, zsh and fish. With JBang or the zip, enable it once:
 
@@ -67,13 +68,20 @@ You can also skip the copying: `jgen -g github:owner/repo` fetches a blueprint f
 [Blueprints from the web](/remote-blueprints/)).
 See [Write your own blueprint](/authoring/) for building one.
 
+## stm-cli
+
+`stm-cli`, the command-line tool for Chenile state machine definitions (diagrams, allowed actions, test cases),
+installs from the same tap: `brew install ajapros/jgen-tap/stm-cli`. It has its own repository,
+[rajakolluru/stm-cli](https://github.com/rajakolluru/stm-cli), and its own releases. It is no longer built
+by chenile-gen's `make all`.
+
 ## Build from source
 
 Use this when you are working on JGen itself:
 
 ```bash
 git clone https://github.com/rajakolluru/chenile-gen.git && cd chenile-gen
-make clean all && source setpath.sh          # builds the modules, puts jgen.sh and stm-cli on PATH
+make clean all && source setpath.sh          # builds the modules, puts jgen.sh on PATH
 ```
 
 The build also produces the distribution zip, `jgen/jgen-cli/target/jgen-cli-<version>-dist.zip`, which is
@@ -99,7 +107,7 @@ The complete reference is the [jgen(1) manual](/manual/), also installed as `man
 | `--fetch` | Fetch, verify and cache a blueprint from GitHub and describe it ([Blueprints from the web](/remote-blueprints/)). |
 | `--trust` | Trust the blueprint sources used in this run without asking. |
 | `--offline` | Use only installed and cached blueprints. |
-| `--search [TEXT]` | Search the [blueprint catalogs](/catalogs/) by name, description or tag (2.1.36). |
+| `--search [TEXT]` | Search the [blueprint catalogs](/catalogs/) by name, description or tag (2.5.1). |
 | `--completion` | Print the completion script for `bash`, `zsh` or `fish`. |
 
 There are three ways to drive JGen.

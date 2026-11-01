@@ -8,6 +8,8 @@
       url: "/why-jgen/"
     - title: "Install &amp; the CLI"
       url: "/install/"
+    - title: "Releases &amp; versions"
+      url: "/releases/"
     - title: "jgen(1) manual"
       url: "/manual/"
     - title: "Configuration &amp; versions"

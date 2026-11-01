@@ -118,7 +118,7 @@ recursively.
 
 ## `_DoT_` â€” dots in names
 
-<span class="pill">2.1.36</span>
+<span class="pill">2.5.1</span>
 
 Every `_DoT_` in a file or folder name is replaced by a dot. Use it whenever the generated project needs a dotfile
 or dot-folder:
@@ -249,7 +249,7 @@ are selected before child blueprints expand, so a marker inside an excluded `%%â
 
 ## Path tags, and adding your own
 
-<span class="pill">2.1.36</span>
+<span class="pill">2.5.1</span>
 
 `.filelist`, `__key__`, `_DoT_` and `%%key=value%%` are all **path tags**: rules for file and folder names that the
 `path-tag-processor` step applies after the templates are rendered. Each tag is a small Java class, and JGen runs

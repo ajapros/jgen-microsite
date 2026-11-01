@@ -18,6 +18,8 @@ baseurl: ""
 
 chenile_docs: "https://chenile.org"
 github_repo: "https://github.com/rajakolluru/chenile-gen"
+jgen_version: "2.5.1"
+# The released Chenile version generated projects target by default (config.json chenileVersion).
 chenile_version: "2.1.35"
 
 markdown: kramdown

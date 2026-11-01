@@ -7,7 +7,7 @@ summary: "Every jgen option, mode, environment variable and file, in the style o
 
 <p>This is the manual page installed with JGen (<code>man jgen</code>). Its source is
 <code>jgen/jgen-cli/src/man/jgen.1.md</code> in the chenile-gen repository. It describes the current development
-version; features marked "since 2.1.36" are not in the 2.1.35 release.</p>
+version; features marked "since 2.5.1" are not in the 2.1.35 release (JGen is now versioned on its own; 2.5.1 follows 2.1.35).</p>
 
 {% raw %}
 <div class="manpage">
@@ -29,14 +29,14 @@ version; features marked "since 2.1.36" are not in the 2.1.35 release.</p>
 <p>Template files ending in <em>.mustache</em> are rendered with Mustache. File and folder names carry further instructions:</p>
 <ul>
 <li><em>__name__</em> is replaced by an input value;</li>
-<li><em>_DoT_</em> becomes a dot, so <em>_DoT_gitignore</em> is generated as <em>.gitignore</em> (since 2.1.36);</li>
+<li><em>_DoT_</em> becomes a dot, so <em>_DoT_gitignore</em> is generated as <em>.gitignore</em> (since 2.5.1);</li>
 <li>a folder named <em>%%key=value%%</em> is kept only when the input matches;</li>
 <li>a <em>.filelist</em> file is split into several files;</li>
 <li>an empty folder named <em>%{{blueprint …}}</em> generates a child blueprint in its place.</li>
 </ul>
 <p>jgen ships with blueprints for Chenile services, workflow services, query modules, mini-monoliths, ecosystems, process deployments, interceptors, integration tests and new blueprints. It accepts other blueprints without a rebuild: from blueprint folders (see <strong>FILES</strong>) or straight from a GitHub release (see <strong>BLUEPRINT REFERENCES</strong>).</p>
 <p>Every input path (prompts, input files, the web portal, child blueprints) goes through the same validator. The validator reports every problem at once, before any file is written.</p>
-<p>Since 2.1.36, a blueprint can ask jgen to make the generated project a local Git repository: when the input <strong>initGit</strong> is true, jgen runs <strong>git init</strong> (branch <strong>main</strong>), adds every file and makes one commit. If the blueprint names a <strong>GITHUB_REPOSITORY</strong> input as its <em>gitRepositoryField</em> and that input has a value, jgen adds it as the <strong>origin</strong> remote, using SSH, or HTTPS when the configuration sets <strong>gitRemoteProtocol</strong> to <strong>https</strong>. jgen never creates the GitHub repository and never pushes.</p>
+<p>Since 2.5.1, a blueprint can ask jgen to make the generated project a local Git repository: when the input <strong>initGit</strong> is true, jgen runs <strong>git init</strong> (branch <strong>main</strong>), adds every file and makes one commit. If the blueprint names a <strong>GITHUB_REPOSITORY</strong> input as its <em>gitRepositoryField</em> and that input has a value, jgen adds it as the <strong>origin</strong> remote, using SSH, or HTTPS when the configuration sets <strong>gitRemoteProtocol</strong> to <strong>https</strong>. jgen never creates the GitHub repository and never pushes.</p>
 <p>After generating, jgen writes a generation record into the project (see <strong>FILES</strong>). <strong>jgen -r</strong> uses it to regenerate the project with a newer blueprint and report what changed.</p>
 <h2 id="modes">MODES</h2>
 <p>jgen does one thing per run. When several mode options are given, the first of <strong>--fetch</strong>, <strong>-r</strong>, <strong>-g</strong> and <strong>-e</strong> wins. With none of them, jgen generates a project.</p>
@@ -117,7 +117,7 @@ version; features marked "since 2.1.36" are not in the 2.1.35 release.</p>
 <dd>Print a usage summary and exit.
 </dd>
 <dt><strong>-V</strong>, <strong>--version</strong></dt>
-<dd>Print the version and exit.
+<dd>Print jgen’s version, the Chenile version generated projects target by default, and the Chenile version jgen was built with (see <strong>VERSIONS</strong>), then exit.
 </dd>
 </dl>
 <h2 id="blueprint-references">BLUEPRINT REFERENCES</h2>
@@ -125,7 +125,7 @@ version; features marked "since 2.1.36" are not in the 2.1.35 release.</p>
 <p><strong>github:</strong><em>owner</em>/<em>repo</em>[/<em>name</em>][@<em>version</em>][#sha256:<em>hex</em>]</p>
 <dl>
 <dt><em>owner/repo</em></dt>
-<dd>The GitHub repository. If its release carries a blueprint jar (exactly one, or exactly one named <em>repo-*.jar</em>; <em>-sources</em>, <em>-javadoc</em> and <em>-tests</em> jars are ignored), jgen uses the jar. Otherwise, or when the tag has no release, jgen uses the repository’s source archive at that tag as a <em>template-only</em> blueprint (since 2.1.36). A template-only blueprint is laid out like a jar’s resources (<em>src/main/resources/META-INF/blueprint.json</em> and its template folder) and may not declare an init hook.
+<dd>The GitHub repository. If its release carries a blueprint jar (exactly one, or exactly one named <em>repo-*.jar</em>; <em>-sources</em>, <em>-javadoc</em> and <em>-tests</em> jars are ignored), jgen uses the jar. Otherwise, or when the tag has no release, jgen uses the repository’s source archive at that tag as a <em>template-only</em> blueprint (since 2.5.1). A template-only blueprint is laid out like a jar’s resources (<em>src/main/resources/META-INF/blueprint.json</em> and its template folder) and may not declare an init hook.
 </dd>
 <dt><em>name</em></dt>
 <dd>Which blueprint to use, when the jar contains several.
@@ -137,10 +137,10 @@ version; features marked "since 2.1.36" are not in the 2.1.35 release.</p>
 <dd>The expected SHA-256, as 64 hexadecimal digits: of the jar, or, for a template-only blueprint, of its files. A mismatch is an error. Pinning is recommended in scripts and CI.
 </dd>
 </dl>
-<p>A local folder holding a template-only blueprint is named with <strong>dir:</strong><em>folder</em> (since 2.1.36). The folder may be the blueprint’s repository or its <em>src/main/resources</em>. It is not cached, locked or trust-checked, so edits apply on the next run.</p>
+<p>A local folder holding a template-only blueprint is named with <strong>dir:</strong><em>folder</em> (since 2.5.1). The folder may be the blueprint’s repository or its <em>src/main/resources</em>. It is not cached, locked or trust-checked, so edits apply on the next run.</p>
 <p>Installed blueprints always take precedence. A fetched blueprint whose name is already taken by an installed one is refused.</p>
 <h2 id="catalogs">CATALOGS</h2>
-<p>Since 2.1.36, a short name that is not installed is looked up in blueprint catalogs: [<em>catalog</em>/]<em>name</em>[@<em>version</em>]. jgen searches the official catalog (<strong>github:ajapros/jgen-catalog</strong>) first, then the catalogs listed in <em>settings.json</em>, and uses the first match. <em>catalog</em> (the catalog’s alias) picks one catalog; <em>version</em> picks a version, otherwise the latest. The entry’s source is then fetched like any <strong>github:</strong> reference, and a version the catalog pins to a SHA-256 is checked.</p>
+<p>Since 2.5.1, a short name that is not installed is looked up in blueprint catalogs: [<em>catalog</em>/]<em>name</em>[@<em>version</em>]. jgen searches the official catalog (<strong>github:ajapros/jgen-catalog</strong>) first, then the catalogs listed in <em>settings.json</em>, and uses the first match. <em>catalog</em> (the catalog’s alias) picks one catalog; <em>version</em> picks a version, otherwise the latest. The entry’s source is then fetched like any <strong>github:</strong> reference, and a version the catalog pins to a SHA-256 is checked.</p>
 <p>Sources listed in the official catalog are trusted. Sources from other catalogs are trusted only if the catalog is marked <strong>trusted</strong> in <em>settings.json</em>; otherwise jgen asks as usual. Catalogs are cached for an hour; when GitHub cannot be reached, or with <strong>--offline</strong>, the cached copy is used.</p>
 <h2 id="trust">TRUST</h2>
 <p>A blueprint can contain Java code, which runs with your permissions. jgen therefore:</p>
@@ -279,8 +279,10 @@ jgen -r ./output/infra --blueprint github:acme/jgen-terraform@2.0.0
 git diff --no-index ./output/orders ./output/orders.regenerated/orders</code></pre>
 <p>Work without network access:</p>
 <pre><code>jgen -g github:acme/jgen-terraform --offline -o tf.json</code></pre>
+<h2 id="versions">VERSIONS</h2>
+<p>Since 2.5.1, jgen has its own version line and release cadence, separate from Chenile’s (2.1.<em>x</em>); 2.5.1 follows 2.1.35. jgen depends only on released Chenile versions. Generated projects target the Chenile version in the configuration’s <strong>chenileVersion</strong>, which defaults to the latest released Chenile. Change it with a config file (<strong>-c</strong>, or <strong>-e</strong> to create one). A blueprint that needs a newer Chenile says so with <strong>sinceVersion</strong> and refuses an older <strong>chenileVersion</strong>. jgen’s own libraries are published as <strong>org.chenile.jgen:jgen-base</strong> and <strong>org.chenile.jgen:jgen-ext-pebble</strong>.</p>
 <h2 id="see-also">SEE ALSO</h2>
-<p><strong>java</strong>(1), <strong>git-diff</strong>(1), <strong>mvn</strong>(1)</p>
+<p><strong>stm-cli</strong>(1), <strong>java</strong>(1), <strong>git-diff</strong>(1), <strong>mvn</strong>(1)</p>
 <p>The JGen documentation: <a href="https://jgen.chenile.org" class="uri">https://jgen.chenile.org</a>. Chenile: <a href="https://chenile.org" class="uri">https://chenile.org</a>.</p>
 <h2 id="bugs">BUGS</h2>
 <p>Report problems at <a href="https://github.com/rajakolluru/chenile-gen/issues" class="uri">https://github.com/rajakolluru/chenile-gen/issues</a>.</p>

@@ -5,7 +5,7 @@ permalink: /catalogs/
 summary: "Use blueprints by short name: jgen -g terraform. Catalogs map names to blueprint sources; the official catalog is built in, and teams can add their own."
 ---
 
-<span class="pill">2.1.36</span>
+<span class="pill">2.5.1</span>
 
 A `github:` reference names a blueprint precisely, but you have to know it. A **catalog** maps short names to
 those references, so people can write what they mean:

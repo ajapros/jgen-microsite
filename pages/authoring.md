@@ -36,11 +36,11 @@ jgen -g jgen-blueprint -o new-blueprint.json
 jgen -f new-blueprint.json
 ```
 
-`standaloneRepo` (2.1.36) decides where the blueprint will live:
+`standaloneRepo` (2.5.1) decides where the blueprint will live:
 
 - **`y`: its own repository** (recommended for anything you will share). `./output/bp-invoice` is a
   self-contained Maven project:
-  - its own `pom.xml`, with `jgen-base` as a provided dependency;
+  - its own `pom.xml`, with `org.chenile.jgen:jgen-base` (the generating JGen's version) as a provided dependency;
   - a `README.md`;
   - a `.gitignore`;
   - a `.github/workflows/release.yml` that publishes the jar when you push a version tag.
@@ -124,7 +124,7 @@ clear message, instead of generating files that weren't rendered. The templates 
 
 ## Step 4 — Write the init hook
 
-> **Or write the hooks in JavaScript (2.1.36).** Declare `"scripts": {"postInputCapture": "scripts/hooks.js"}` in
+> **Or write the hooks in JavaScript (2.5.1).** Declare `"scripts": {"postInputCapture": "scripts/hooks.js"}` in
 > `blueprint.json` and put a `postInputCapture(inputs, jgen)` function in that file. Scripts run in a sandbox, need
 > no build, and keep the blueprint template-only. See [Scripting hooks](/scripting/).
 
@@ -169,7 +169,7 @@ get yours there.
   jar to `~/.jgen/blueprints` (or the installation's `blueprints/` folder, or a folder listed in
   `JGEN_BLUEPRINTS`). An installed JGen picks it up on its next run. See
   [Adding blueprints without a rebuild](/install/#adding-blueprints-without-a-rebuild).
-- **Template-only, straight from a repository (2.1.36).** If the blueprint has no Java init hook (JavaScript
+- **Template-only, straight from a repository (2.5.1).** If the blueprint has no Java init hook (JavaScript
   hooks are fine), it needs no jar:
   push a version tag and use it as `github:owner/repo@tag`, or try it locally as `dir:<folder>`. See
   [template-only blueprints](/remote-blueprints/#template-only-blueprints).
@@ -197,7 +197,7 @@ Then inspect the output tree and iterate on the template folder and hook. The fa
 
 ## Generating a Git repository: `initGit`
 
-<span class="pill">2.1.36</span>
+<span class="pill">2.5.1</span>
 
 Any blueprint can have JGen turn the project it generates into a local Git repository. No code is needed.
 

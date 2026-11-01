@@ -5,7 +5,7 @@ permalink: /extensions/
 summary: "Template engines, language packs and path tags: add a template language, support another target language, or add a new tag, without changing JGen. Blueprints declare what they need with requires."
 ---
 
-<span class="pill">2.1.36</span>
+<span class="pill">2.5.1</span>
 
 JGen started as a generator for Chenile's Java services, but its engine doesn't care what it generates. Three
 **extension points** let you take it elsewhere without forking it:
@@ -99,7 +99,8 @@ has an `order`, which sets when it runs relative to the others.
 
 ## Writing an extension
 
-An extension is an ordinary jar. Implement one of these interfaces from `jgen-base` (a `provided` dependency):
+An extension is an ordinary jar. Implement one of these interfaces from `org.chenile.jgen:jgen-base` (a `provided`
+dependency, the same version as the JGen it runs in):
 
 ```java
 public interface TemplateEngine {                      // org.chenile.jgen.ext
