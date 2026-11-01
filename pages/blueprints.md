@@ -144,7 +144,7 @@ per definition.
 Takes a complete, prepared process-definition set and **expands it into per-definition worker modules**,
 invoking `chenile-process-workers` once per process type. It owns the iteration (and the process-definition
 validation) so the process-management aggregate stays simple. You rarely run it standalone —
-`chenile-process-management` invokes it once with the marker `%{{chenile-process-worker-set}}`. It is an
+`chenile-process-management` invokes it once with the marker {% raw %}`%{{chenile-process-worker-set}}`{% endraw %}. It is an
 [aggregated blueprint](/aggregated-blueprints/).
 
 **Fields:** `application`, `applicationVersion`, `com`/`company`/`org`, `destFolder`, `processSpec` *(FILE)*,

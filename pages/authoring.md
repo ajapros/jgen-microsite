@@ -117,7 +117,16 @@ If your blueprint reads an external definition file, add a `FILE` field. If its 
 Chenile feature introduced after the oldest supported release, add a top-level `sinceVersion` — JGen will then
 reject generation (before the hook or any copy) for a config whose `chenileVersion` is too old.
 
+If the blueprint uses an added [extension](/extensions/) (say Pebble templates or a language pack's rule), list it in
+`"requires": ["pebble", "terraform@1.2"]`. JGen then refuses the blueprint when the extension is missing, with a
+clear message, instead of generating files that weren't rendered. The templates can be in any installed engine:
+`.mustache`, `.peb`, or an added one.
+
 ## Step 4 — Write the init hook
+
+> **Or write the hooks in JavaScript (2.1.36).** Declare `"scripts": {"postInputCapture": "scripts/hooks.js"}` in
+> `blueprint.json` and put a `postInputCapture(inputs, jgen)` function in that file. Scripts run in a sandbox, need
+> no build, and keep the blueprint template-only. See [Scripting hooks](/scripting/).
 
 The generated init class is a stub. Its job is to populate derived values in the template map **before**
 generation — capitalized names, derived package fragments, parsed XML/JSON, or post-generation logic. Register a
@@ -160,7 +169,8 @@ get yours there.
   jar to `~/.jgen/blueprints` (or the installation's `blueprints/` folder, or a folder listed in
   `JGEN_BLUEPRINTS`). An installed JGen picks it up on its next run. See
   [Adding blueprints without a rebuild](/install/#adding-blueprints-without-a-rebuild).
-- **Template-only, straight from a repository (2.1.36).** If the blueprint has no init hook, it needs no jar:
+- **Template-only, straight from a repository (2.1.36).** If the blueprint has no Java init hook (JavaScript
+  hooks are fine), it needs no jar:
   push a version tag and use it as `github:owner/repo@tag`, or try it locally as `dir:<folder>`. See
   [template-only blueprints](/remote-blueprints/#template-only-blueprints).
 - **Publish it on GitHub.** With `standaloneRepo` = `y` this is already set up: push the local repository, then

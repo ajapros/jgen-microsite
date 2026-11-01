@@ -45,6 +45,25 @@ independently. `required`, defaults, dropdown `validValues` and `visibleWhen` ke
 are skipped, absent optional values are accepted, and resolved values are validated. **Validation never rewrites
 a name to make it valid** — an invalid value fails rather than being silently corrected.
 
+## Rules from language packs
+
+<span class="pill">2.1.36</span>
+
+Language packs add rules for other target languages. Blueprints name them the same way, for example
+`"validation": "PYTHON_MODULE"`. The `python` and `node` packs are built in:
+
+| Rule | Accepted values |
+| --- | --- |
+| `PYTHON_MODULE` | Lowercase letters, digits and `_`, not starting with a digit, not a Python keyword: `order_service`. |
+| `PYTHON_PACKAGE` | Dot-separated `PYTHON_MODULE` names: `acme.orders`. |
+| `PYPI_PROJECT` | Letters, digits, `.`, `_` or `-`, starting and ending with a letter or digit: `acme-orders`. |
+| `NPM_PACKAGE` | Lowercase, optionally scoped, at most 214 characters: `@acme/orders`. |
+| `JS_IDENTIFIER` | A JavaScript identifier that is not a reserved word: `orderService`. |
+
+A rule name that is neither built in nor defined by an installed pack is rejected as soon as the field is read,
+so a typo such as `"validation": "PYTHON_MODUEL"` fails the blueprint when it loads. A blueprint whose rules come from an added
+pack should list that pack in `requires`. See [Extending JGen](/extensions/#language-packs).
+
 ## Your own format: `PATTERN`
 
 <span class="pill">2.1.36</span>

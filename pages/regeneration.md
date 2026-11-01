@@ -31,6 +31,7 @@ After a top-level blueprint generates a project, JGen writes `<project>/.jgen/ge
 | `inputs` | the validated inputs for the blueprint's declared fields, *before* any hook added derived values (no `destFolder`) |
 | `fileInputs` | FILE inputs (a workflow XML, a process definition), copied into `.jgen/inputs/<field>/` so the project can be regenerated without the original file |
 | `files` | every generated file and its SHA-256 |
+| `extensions` | (2.1.36, only when there are any) the [added extensions](/extensions/#requires-what-a-blueprint-needs) the project depended on, as `kind:name@version`; `jgen -r` needs them installed |
 
 Child blueprints expanded inside a parent do not get their own record: regenerating the parent regenerates them.
 Tool folders (`.git`, `target`, `build`, `node_modules`, `.idea`) are never hashed. Commit `.jgen/` with the

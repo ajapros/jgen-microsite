@@ -90,7 +90,7 @@ handy for annotating a template without affecting output.
 # Markup in file and folder names
 
 The following markers appear in **names**, not contents, and are applied by dedicated pipeline steps *after*
-Mustache rendering. (A name-marker folder is skipped by the path replacer so it survives until its own step.)
+Mustache rendering. (A name-marker folder is skipped by the path tags so it survives until its own step.)
 
 ## `__key__` — path placeholders
 
@@ -161,7 +161,7 @@ Exact semantics to keep in mind:
   language, no negation, and no `!=`. For the opposite case, use a second folder with the other value, or an
   inverted Mustache section inside a file.
 - Enabled booleans are the string `"true"`, so the idiom is `%%flag=true%%`.
-- Conditional folders run **before** aggregation markers expand, so wrapping a `%{{…}}` marker in a
+- Conditional folders run **before** aggregation markers expand, so wrapping a {% raw %}`%{{…}}`{% endraw %} marker in a
   `%%flag=true%%` folder is how you include a child blueprint only when a flag is set — see
   [Aggregated blueprints](/aggregated-blueprints/).
 
@@ -183,7 +183,7 @@ The text on the `--START--` line after the marker is the output filename; the li
 contents. The source `.filelist` is deleted after splitting.
 
 **The powerful combination is `*.filelist.mustache`.** Because Mustache rendering (step 7) runs **before** the
-file-splitter (step 8), a filelist can be a Mustache template *first* and a multi-file container *second* — so
+the `filelist` path tag (step 8), a filelist can be a Mustache template *first* and a multi-file container *second* — so
 both the `--START--` filenames **and** the file bodies can be computed from the map. This is how one template
 emits a variable number of files — for example one worker class per element of a list:
 
@@ -199,18 +199,20 @@ public class {{#capitalize}}{{name}}{{/capitalize}}Executor
 
 With three processes in the list, that single source renders and then splits into three `…Executor.java` files.
 
-## `%{{blueprint attr=value}}` — aggregation markers
+## {% raw %}`%{{blueprint attr=value}}`{% endraw %} — aggregation markers
 
-An **empty** folder named `%{{blueprint …}}` invokes another registered blueprint at that location — once,
+An **empty** folder named {% raw %}`%{{blueprint …}}`{% endraw %} invokes another registered blueprint at that location — once,
 conditionally, or once per list element. The marker's grammar is strict:
 
+{% raw %}
 ```text
 %{{chenile-service name=orders}}
 %{{minimonolith role=worker label="Background workers"}}
 %{{chenile-process-workers forEach=processes as=process}}
 ```
+{% endraw %}
 
-- Prefix `%{{`, suffix `}}`.
+- Prefix {% raw %}`%{{`{% endraw %}, suffix `}}`.
 - The **first token** is the exact registered blueprint name, matching `[A-Za-z0-9][A-Za-z0-9_.-]*`.
 - Then zero or more `key=value` **attributes**. A key matches `[A-Za-z_][A-Za-z0-9_.-]*`; no spaces around `=`.
 - A value is either **unquoted** (no whitespace, and no `'`, `"` or `=` inside) or **quoted** with single or
@@ -235,15 +237,55 @@ Order matters because each marker sees the tree as the previous step left it. Fr
 | Step | Marker | Acts on |
 | --- | --- | --- |
 | 7 `file-template-executor` | `{% raw %}{{ }}{% endraw %}`, `{% raw %}{{{ }}}{% endraw %}`, sections, `capitalize` | **contents** of `.mustache` files |
-| 8 `file-splitter` | `--START--` / `--END--` | `.filelist` files (already rendered) |
-| 9 `file-name-replacer` | `__key__` | file and folder **names** |
-| 9a `dot-replacer` | `_DoT_` | file and folder **names** |
-| 10 `conditional-processor` | `%%key=value%%` | folder **names** |
-| 11 `blueprint-expander` | `%{{blueprint …}}` | empty marker **folders** |
+| 8 path tag `filelist` | `--START--` / `--END--` | `.filelist` files (already rendered) |
+| 9 path tag `placeholder` | `__key__` | file and folder **names** |
+| 9a path tag `dot` | `_DoT_` | file and folder **names** |
+| 10 path tag `conditional` | `%%key=value%%` | folder **names** |
+| 11 `blueprint-expander` | {% raw %}`%{{blueprint …}}`{% endraw %} | empty marker **folders** |
 
 The practical consequences: Mustache in a file is resolved before that file's path placeholders; a
 `.filelist.mustache` is rendered before it is split, so its filenames can be dynamic; and conditional folders
 are selected before child blueprints expand, so a marker inside an excluded `%%…%%` folder is never invoked.
+
+## Path tags, and adding your own
+
+<span class="pill">2.1.36</span>
+
+`.filelist`, `__key__`, `_DoT_` and `%%key=value%%` are all **path tags**: rules for file and folder names that the
+`path-tag-processor` step applies after the templates are rendered. Each tag is a small Java class, and JGen runs
+them one pass at a time, by their `order`:
+
+| Tag | Order | Marker |
+| --- | --- | --- |
+| `filelist` | 100 | `name.filelist` |
+| `placeholder` | 200 | `__key__` |
+| `dot` | 300 | `_DoT_` |
+| `conditional` | 400 | `%%key=value%%` |
+
+You can add tags without changing JGen. Implement `org.chenile.jgen.template.tags.PathTag`:
+
+```java
+public class UpperTag implements PathTag {
+    public String name() { return "upper"; }
+    public int order() { return 250; }                  // after placeholders, before dots
+    public boolean matches(String name) { return name.startsWith("_UP_"); }
+    public void process(File file, TemplateContext context) {
+        file.renameTo(new File(file.getParentFile(), file.getName().substring(4).toUpperCase()));
+    }
+}
+```
+
+List it in `META-INF/services/org.chenile.jgen.template.tags.PathTag`, build a jar, and put the jar where JGen
+looks for blueprint jars. Path tags are one of three [extension points](/extensions/), with template engines and
+language packs. Put the jar in one of these folders (`~/.jgen/blueprints`, the installation's `blueprints/` folder or `JGEN_BLUEPRINTS`).
+
+- **Every blueprint gets the tag.** Tags are installation-wide, unlike hooks, which belong to one blueprint.
+- **Built-ins can't be replaced.** Two tags with the same name stop JGen, and an extension can't reuse a built-in
+  name.
+- **Markers are left alone.** Tags never see {% raw %}`%{{…}}`{% endraw %} aggregation markers.
+- **Regeneration needs the same tags.** The [generation record](/regeneration/) lists the extension tags that were
+  active, and `jgen -r` refuses to regenerate a project when one of them is missing, rather than produce
+  differently named files.
 
 ## Quick rules
 
@@ -255,4 +297,4 @@ are selected before child blueprints expand, so a marker inside an excluded `%%�
   `{% raw %}{{^flag}}{% endraw %}` for a few lines.
 - Need a variable number of files? A `*.filelist.mustache` driven by a list.
 - Need a dotfile such as `.gitignore` or a `.github` folder? Name it `_DoT_gitignore` or `_DoT_github`.
-- Need to compose other blueprints? An empty `%{{blueprint …}}` folder plus a `childBlueprintInputs` callback.
+- Need to compose other blueprints? An empty {% raw %}`%{{blueprint …}}`{% endraw %} folder plus a `childBlueprintInputs` callback.

@@ -12,11 +12,13 @@ defaults, validation, hooks and generation pipeline under the same JGen config. 
 
 ## Marker syntax
 
+{% raw %}
 ```text
 %{{chenile-service name=orders}}
 %{{minimonolith role=server}}
 %{{minimonolith role=worker label="Background workers"}}
 ```
+{% endraw %}
 
 The first token is the exact registered blueprint name (not its Maven module name). The remaining `key=value`
 tokens are passed to the callback as a `Map<String,String>` — values stay strings, including `true` and numbers,
@@ -32,6 +34,7 @@ attributes.
 
 ## Template layout and output placement
 
+{% raw %}
 ```text
 aggregate-template/
   __application__/
@@ -40,6 +43,7 @@ aggregate-template/
     %{{minimonolith role=server}}/        .gitkeep
     %{{minimonolith role=worker}}/        .gitkeep
 ```
+{% endraw %}
 
 Marker folders must be **empty** (an empty `.gitkeep` is allowed so Git retains them; any other contents are
 rejected). At generation the marker disappears and its parent directory receives the child's normal output tree:
@@ -110,11 +114,13 @@ blueprint modules must be on the CLI or portal classpath so their descriptors en
 
 Enclose the marker in a standard conditional folder and declare the flag as a `BOOLEAN` input:
 
+{% raw %}
 ```text
 __application__/
   %%includeWorker=true%%/
     %{{minimonolith role=worker}}/   .gitkeep
 ```
+{% endraw %}
 
 When the flag is false the whole section is removed **before** expansion — JGen never resolves that child,
 evaluates its attributes, invokes the callback, or generates its files. This holds even when the marker is
@@ -122,9 +128,11 @@ several directories below the conditional folder.
 
 ## Repeat a child for a prepared list
 
+{% raw %}
 ```text
 %{{chenile-process-workers forEach=processes as=process}}/   .gitkeep
 ```
+{% endraw %}
 
 `forEach` and `as` are reserved expansion attributes: `forEach` names a list in the enclosing input map (dotted
 paths are supported); `as` names the per-element binding. Each invocation gets an isolated map with

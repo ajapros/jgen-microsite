@@ -31,13 +31,15 @@ The `processors` flow runs these processors, in this sequence:
 | 3a | `input-snapshot` | Keeps a copy of the validated inputs, before any hook changes them, for the [generation record](/regeneration/). Top-level generations only. |
 | 4 | `post-input-executor` | Runs the blueprint's **post-input (init) hook**, letting the author manipulate the input map (derive names, parse files). |
 | 5 | `folder-copier` | Copies the blueprint's template folder from its JAR into the destination. |
-| 6 | `lambda-loader` | Loads helper lambda functions that templates can call. |
-| 7 | `file-template-executor` | Renders every `.mustache` file to its destination file. |
-| 8 | `file-splitter` | Breaks every `.filelist` file into multiple files. |
-| 9 | `file-name-replacer` | Replaces `__name__` placeholders in file and folder names from the map. |
-| 9a | `dot-replacer` | (2.1.36) Turns every `_DoT_` in file and folder names into a dot: `_DoT_gitignore` becomes `.gitignore` (see [Template reference](/template-conventions/#_dot_--dots-in-names)). |
-| 10 | `conditional-processor` | Processes `%%key=value%%` folders: promote on match, discard otherwise. |
-| 11 | `blueprint-expander` | Expands surviving child markers (`%{{…}}`) through their own pipelines — see [Aggregated blueprints](/aggregated-blueprints/). |
+| 6 | `lambda-loader` | Puts the [template helpers](/extensions/#template-helpers) (`capitalize`, `camelCase`, `snakeCase`, … and any language pack's) into the map for Mustache. |
+| 7 | `file-template-executor` | Renders every template with the [engine](/extensions/#template-engines) its extension selects (`.mustache`, `.peb`, or an added engine's) and drops the extension. |
+| 8–10 | `path-tag-processor` | Applies the [path tags](/template-conventions/#path-tags-and-adding-your-own) to file and folder names, one pass per tag, in order: |
+| 8 | ↳ `filelist` | Breaks every `.filelist` file into multiple files. |
+| 9 | ↳ `placeholder` | Replaces `__name__` placeholders in file and folder names from the map. |
+| 9a | ↳ `dot` | (2.1.36) Turns every `_DoT_` in file and folder names into a dot: `_DoT_gitignore` becomes `.gitignore` (see [Template reference](/template-conventions/#_dot_--dots-in-names)). |
+| 10 | ↳ `conditional` | Processes `%%key=value%%` folders: promote on match, discard otherwise. |
+| | ↳ *extension tags* | (2.1.36) Tags added by extension jars run at the position their `order` gives them. |
+| 11 | `blueprint-expander` | Expands surviving child markers ({% raw %}`%{{…}}`{% endraw %}) through their own pipelines — see [Aggregated blueprints](/aggregated-blueprints/). |
 | 12 | `post-process-executor` | Runs the blueprint's **post-process hook** for custom destination-folder logic, after all children. |
 | 13 | `provenance-writer` | Writes `.jgen/generation.json`: blueprint, config, inputs and a hash of every generated file. Top-level generations only. |
 | 14 | `git-initializer` | (2.1.36) With `initGit` true: makes the project a local Git repository with one commit, and adds the blueprint's `gitRepositoryField` value as `origin` (see [Generating a Git repository](/authoring/#generating-a-git-repository-initgit)). Top-level generations only. |

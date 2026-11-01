@@ -21,6 +21,7 @@ version; features marked "since 2.1.36" are not in the 2.1.35 release.</p>
 <p><strong>jgen</strong> <strong>-r</strong> <em>project</em> [<strong>--into</strong> <em>folder</em>] [<strong>--blueprint</strong> <em>blueprint</em>] [<strong>-c</strong> <em>config</em>] [<strong>--trust</strong>] [<strong>--offline</strong>]</p>
 <p><strong>jgen</strong> <strong>--fetch</strong> <em>reference</em> [<strong>--trust</strong>] [<strong>--offline</strong>]</p>
 <p><strong>jgen</strong> <strong>--search</strong> [<em>text</em>] [<strong>--offline</strong>]</p>
+<p><strong>jgen</strong> <strong>--extensions</strong></p>
 <p><strong>jgen</strong> <strong>--completion</strong> <em>shell</em></p>
 <p><strong>jgen</strong> <strong>-h</strong> | <strong>-V</strong></p>
 <h2 id="description">DESCRIPTION</h2>
@@ -100,6 +101,9 @@ version; features marked "since 2.1.36" are not in the 2.1.35 release.</p>
 <dt><strong>--search</strong> [<em>text</em>]</dt>
 <dd>Search the blueprint catalogs (see <strong>CATALOGS</strong>) for entries whose name, description or tags contain <em>text</em>; without <em>text</em>, list every entry. Each result shows <em>catalog</em>/<em>name</em>, its description, source and tags.
 </dd>
+<dt><strong>--extensions</strong></dt>
+<dd>List the installed extensions: template engines with the file extension each renders, language packs with their validation rules and helpers, path tags in the order they run, and every template helper. Built-in extensions are marked; added ones show their class and version. See <strong>EXTENSIONS</strong>.
+</dd>
 <dt><strong>--trust</strong></dt>
 <dd>Trust every blueprint source used in this run without asking. Use this in scripts and CI only for sources you have reviewed. Prefer listing them in <em>settings.json</em> (see <strong>FILES</strong>).
 </dd>
@@ -145,6 +149,21 @@ version; features marked "since 2.1.36" are not in the 2.1.35 release.</p>
 <li>records the SHA-256 of each fetched version in <em>blueprints.lock.json</em> the first time it is used, and refuses the version if its jar later changes.</li>
 <li>loads each fetched jar in its own class loader.</li>
 </ul>
+<h2 id="extensions">EXTENSIONS</h2>
+<p>Extensions add to what every blueprint can use. There are three kinds:</p>
+<dl>
+<dt><em>Template engines</em></dt>
+<dd>render template files chosen by extension. <strong>mustache</strong> (<em>.mustache</em>) is built in, and <strong>pebble</strong> (<em>.peb</em>) ships with jgen.
+</dd>
+<dt><em>Language packs</em></dt>
+<dd>add validation rules and template helpers for a language. <strong>python</strong> (<strong>PYTHON_MODULE</strong>, <strong>PYTHON_PACKAGE</strong>, <strong>PYPI_PROJECT</strong>) and <strong>node</strong> (<strong>NPM_PACKAGE</strong>, <strong>JS_IDENTIFIER</strong>) are built in.
+</dd>
+<dt><em>Path tags</em></dt>
+<dd>add rules for file and folder names. <strong>filelist</strong>, <strong>placeholder</strong>, <strong>dot</strong> and <strong>conditional</strong> are built in.
+</dd>
+</dl>
+<p>An extension is a jar that lists its classes in <strong>META-INF/services/</strong> under the interface’s name. Put the jar in a blueprints folder (see <strong>FILES</strong>). Extension names are unique, and built-in extensions can’t be replaced.</p>
+<p>A blueprint names what it needs in <strong>requires</strong>, as <em>name</em> or <em>name</em>@<em>minimum-version</em>. jgen refuses a blueprint whose requirements aren’t installed, before reading its fields. A <strong>validation</strong> name that is neither built in nor defined by an installed language pack is an error. The generation record lists the added extensions a project was generated with, and <strong>-r</strong> refuses to regenerate a project without them.</p>
 <h2 id="shell-completion">SHELL COMPLETION</h2>
 <p>Homebrew installs completion for bash, zsh and fish. Otherwise, enable it once:</p>
 <dl>
