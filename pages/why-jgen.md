@@ -79,12 +79,17 @@ behaviour is visible in its template tree, because file and folder **names** car
   one template can emit one class per entity, one listener per process type, one test per state, however many the
   input asks for. Most template-only generators can produce a fixed set of files; producing a *variable* number
   usually means writing code.
+- **Dotfiles.** `_DoT_` in a name becomes a dot, so `_DoT_gitignore` and `_DoT_github/workflows/ci.yml` arrive as
+  `.gitignore` and `.github/workflows/ci.yml`. Maven would otherwise leave them out of the blueprint jar.
+- **A Git repository, for free.** A blueprint that sets `initGit` gets its output as a local Git repository with
+  one commit. If it names a `GITHUB_REPOSITORY` input, the repository is also wired to GitHub as `origin`, ready to
+  push.
 - **Child blueprint markers.** An empty folder named {% raw %}`%{{chenile-service forEach=services as=service}}`{% endraw %} runs
   another blueprint in place, once per element of a list. Put it inside a `%%flag=true%%` folder and it runs
   only when asked for.
 
 The order is fixed and documented ([pipeline](/pipeline/)): Mustache first, then file lists, then path
-placeholders, then conditional folders, then child blueprints. So the pieces combine predictably. Reviewing a
+placeholders and dots, then conditional folders, then child blueprints. So the pieces combine predictably. Reviewing a
 blueprint is mostly reading a folder; the [template reference](/template-conventions/) covers the whole
 vocabulary.
 
@@ -93,7 +98,7 @@ vocabulary.
 A pattern gets a garment most of the way; a good tailor still adjusts the measurements, cuts the lining to
 match, and presses the seams at the end. Templates are likewise the right tool for most of a project and the
 wrong tool for some of it. JGen lets a blueprint
-author add Java at four well-defined points, and nowhere else:
+author add Java at five well-defined points, and nowhere else:
 
 | Hook | When it runs | What it is for |
 |---|---|---|
@@ -101,6 +106,7 @@ author add Java at four well-defined points, and nowhere else:
 | `postInputCaptureHook` | after inputs are validated, before any file is written | **augment the input map**: derive names (`orders` → `Orders`), or parse an uploaded file into structures the templates iterate over |
 | `childBlueprintInputs` | for each child blueprint marker | **compute the child's input map** from the parent's inputs and the marker's attributes |
 | `postProcessHook` | after generation | **touch the generated code**: copy a supplied file into place, relocate output, run a formatter or another tool |
+| `finalHook` | last, after the generation record and the Git repository | work outside the file tree, e.g. printing project-specific next steps |
 
 The built-in blueprints show the range:
 
@@ -123,18 +129,20 @@ A blueprint is a single Maven module, built into a single jar. The jar holds the
 tests. Nothing about the blueprint lives anywhere else.
 Consequences I value more every year:
 
-- **Modular by construction.** Adding a blueprint to JGen means adding a dependency. Removing it means removing
-  the dependency. The registry finds every `blueprint.json` on the classpath; there is no central catalogue to
+- **Modular by construction.** Adding a blueprint to JGen means dropping its jar into a blueprints folder (or
+  adding it as a dependency). Removing it means taking the jar away. The registry finds every `blueprint.json` on the classpath; there is no central catalogue to
   edit and no plugin directory to keep in sync.
 - **Versioned and published like any library.** A team can publish its blueprints to its own Maven repository,
   pin versions, and roll them forward deliberately. The template and the code that supports it can never drift
   apart, because they are released as one artefact.
 - **Testable like any library.** A blueprint's tests sit in the same module as its templates and run in the normal build.
 - **Shareable without a server.** A blueprint jar works the same in the CLI, the web portal, a CI job or another
-  program.
+  program, and a GitHub release is enough to publish one: `jgen -g github:owner/repo` fetches it, checks that you
+  trust the source and that the jar has not changed since you first used it, and runs it in its own class loader
+  ([blueprints from the web](/remote-blueprints/)).
 
 npm-packaged Yeoman generators and Nx plugins share some of this. The difference is that a JGen jar is mostly
-templates and data, with code only at the four hook points. Cookiecutter and Copier templates are git
+templates and data, with code only at the five hook points. Cookiecutter and Copier templates are git
 repositories, which is convenient, but any supporting logic is hook scripts beside the template, not a tested,
 versioned unit.
 
@@ -163,19 +171,39 @@ code that will not run on the configured version.
 
 ## How it compares
 
-The tools below are all good at what they set out to do. The table is about fit, not ranking.
+The tools below are all good at what they set out to do. The tables are about fit, not ranking. The first
+compares how you *write* a generator; the second compares what happens when you *use* one.
 
-| | Blueprint written as | Packaged as | Input validation | Generators composing generators | Updating generated projects | Runtime |
-|---|---|---|---|---|---|---|
-| **JGen** | typed contract + template tree with path markup (conditional folders, file lists) + four optional Java hooks | one versioned jar: contract, templates, hooks | declarative, all errors at once, same validator on every path | yes, marker folders (once, conditional, per list element) with computed child inputs | regenerates alongside and classifies every file (`jgen -r`); merging left to git or an agent | JVM |
-| [Cookiecutter](https://github.com/cookiecutter/cookiecutter) | Jinja templates + `cookiecutter.json` + hook scripts | a git repo or folder | in hooks | no | no | Python |
-| [Copier](https://copier.readthedocs.io/) | Jinja templates + `copier.yml` + tasks | a git repo with version tags | per-question validators | several templates can be applied to one project | **yes**, from tagged template versions | Python |
-| [Yeoman](https://yeoman.io/) | JavaScript generator code + EJS | npm package | in code | yes, in code | no | Node |
-| [JHipster](https://www.jhipster.tech/) | a full application generator (Yeoman-based) with JDL | npm packages | strong, for its own domain model | blueprints override parts of it | yes, `jhipster upgrade` | Node |
-| [Nx generators](https://nx.dev/) | TypeScript against a file-tree API + JSON schema | npm plugin | JSON schema | yes, in code | yes, migrations | Node, Nx workspace |
-| [Plop](https://plopjs.com/) / [Hygen](https://www.hygen.io/) | Handlebars / EJS snippets + JS prompts | files in your repo | in code | no | no | Node |
-| [Backstage Scaffolder](https://backstage.io/docs/features/software-templates/) | Nunjucks templates + actions | a template entity in a developer portal | form schema | step pipelines | no | a Backstage installation |
-| Spring Initializr / Maven archetypes | fixed project skeletons | a service / an archetype jar | minimal | no | no | JVM |
+### Writing a blueprint
+
+| | Blueprint written as | Packaged as | Input validation | Generators composing generators |
+|---|---|---|---|---|
+| **JGen** | typed contract + template tree with name markup (`__key__`, `_DoT_`, `%%key=value%%`, `.filelist`) + five optional Java hooks | one versioned jar: contract, templates, hooks | declarative named rules plus your own `PATTERN`, conditional visibility; every error at once, by the same validator on every path | yes, marker folders (once, conditional, per list element) with computed child inputs |
+| [Cookiecutter](https://github.com/cookiecutter/cookiecutter) | Jinja templates + `cookiecutter.json` + hook scripts | a git repo, zip or folder | in hooks | no |
+| [Copier](https://copier.readthedocs.io/) | Jinja templates + `copier.yml` + tasks | a git repo with version tags | per-question validators | several templates can be applied to one project |
+| [Yeoman](https://yeoman.io/) | JavaScript generator code + EJS | npm package | in code | yes, in code |
+| [JHipster](https://www.jhipster.tech/) | a full application generator (Yeoman-based) with JDL | npm packages | strong, for its own domain model | blueprints override parts of it |
+| [Nx generators](https://nx.dev/) | TypeScript against a file-tree API + JSON schema | npm plugin | JSON schema | yes, in code |
+| [Plop](https://plopjs.com/) / [Hygen](https://www.hygen.io/) | Handlebars / EJS snippets + JS prompts | files in your repo | in code | no |
+| [Backstage Scaffolder](https://backstage.io/docs/features/software-templates/) | Nunjucks templates + actions | a template entity in a developer portal | form schema | step pipelines |
+| Spring Initializr / Maven archetypes | fixed project skeletons | a service / an archetype jar | minimal | no |
+
+### Using one
+
+| | Templates from the web | Running someone else's code | What the project remembers | Updating a generated project | Git repository |
+|---|---|---|---|---|---|
+| **JGen** | `github:owner/repo@version` (a release jar); or drop a jar in a folder | trusted sources only, others asked first; SHA-256 locked on first use and optionally pinned; each blueprint in its own class loader | `.jgen/generation.json`: blueprint and version, config, inputs, copies of input files, a hash of every generated file | regenerates alongside and classifies every file (`jgen -r`); merging left to git or an agent | opt-in per blueprint: `git init`, one commit, GitHub `origin` set; never creates or pushes |
+| Cookiecutter | any git URL, `gh:` shorthand, zip or folder | runs the template's hooks | nothing in the project (a replay file in your home folder) | no (the separate *cruft* tool adds it) | no |
+| Copier | any git URL or `gh:` shorthand | tasks and extensions need `--trust` or a trusted-template setting | `.copier-answers.yml`: answers and template version | **yes**, `copier update` merges newer template versions | no |
+| Yeoman | npm packages | npm's trust model | `.yo-rc.json` configuration | no | some generators do |
+| JHipster | npm packages | npm's trust model | `.yo-rc.json` and JDL | yes, `jhipster upgrade` | yes, by default |
+| Nx | npm plugins | npm's trust model | the workspace itself | yes, migrations | yes, for new workspaces |
+| Plop / Hygen | in your repository | your own code | nothing | no | no (works inside an existing repo) |
+| Backstage | templates registered in the catalog | governed by the platform's permissions | a catalog entity | no | **yes**, its publish actions create the repository and push |
+| Initializr / archetypes | a web service / Maven repositories | none / Maven's | nothing | no | no |
+
+JGen also installs like the others (Homebrew, JBang or a zip) and ships a [manual page](/manual/) and tab
+completion for bash, zsh and fish.
 
 A few notes, in fairness to the others:
 
@@ -184,6 +212,12 @@ A few notes, in fairness to the others:
   measurements that cut it, and `jgen -r` re-cuts it with the current blueprint and classifies every file (safe
   update, keep yours, conflict, new, delete). The merge is left to `git`, a person or an AI agent, which is where
   merging is now best done. If you want the tool itself to merge, Copier is the stronger choice.
+- **Cookiecutter and Copier take any repository as a template.** JGen needs a published blueprint jar when the
+  blueprint has Java hooks. In return you get a versioned, testable artefact and a hash JGen can check. Template-only
+  blueprints straight from a repository are on the roadmap.
+- **Backstage goes all the way to GitHub.** Its scaffolder creates the repository and pushes, because it is a
+  hosted platform with your organisation's credentials. JGen stops at a local repository with `origin` set, so it
+  never acts on your account.
 - **JHipster is a ready-made garment shop, JGen is a tailor.** JHipster generates a complete, opinionated
   application stack and upgrades it; it is the right answer if its stack is your stack. JGen gives you the means
   to capture *your* stack.
@@ -191,16 +225,21 @@ A few notes, in fairness to the others:
   workspace. JGen does not assume any repository layout.
 - **Plop and Hygen are for small, frequent snippets** inside an existing codebase: a component here, a reducer
   there. JGen is happiest generating whole projects and modules.
-- **Backstage is an organisational front door**, with access control and catalogue integration. JGen can sit
-  behind something like it as the engine that produces the code.
 - **Initializr and archetypes are the simplest way to get one Spring or Maven skeleton.** They stop there.
+
+If one line sums it up: JGen is the generator with the strongest governance story. Its inputs are typed and
+checked, its sources are trusted and pinned, every project records how it was made, and people and AI agents drive
+the same patterns. Teams that want consistent, reviewable output usually reach for a platform such as Backstage or
+Nx to get this. JGen is a lightweight command-line tool with no platform to run.
 
 ## Where JGen is not the right tool (yet)
 
 - It does not merge blueprint changes into an existing project itself; it regenerates alongside and reports
   ([regeneration](/regeneration/)).
+- There is no catalogue of blueprints yet: you find one by its repository name, or by the GitHub topic
+  `jgen-blueprint`. Catalogues are the next step on the [roadmap](/remote-blueprints/#later-phases).
 - The flip side of one-jar packaging: writing a blueprint means a small Maven build, even if the output is pure
-  YAML, and hooks are written in Java.
+  YAML, and hooks are written in Java. (Using JGen needs no build: install it with Homebrew or JBang.)
 - The community is small compared with Cookiecutter's or Yeoman's, so you will be writing more of your own
   blueprints than downloading them.
 
@@ -217,8 +256,7 @@ for any blueprint.
 ## Try it
 
 ```bash
-git clone https://github.com/rajakolluru/chenile-gen.git && cd chenile-gen
-make clean all && source setpath.sh          # puts jgen on PATH
+brew install ajapros/jgen-tap/jgen          # or: jbang app install jgen@rajakolluru/chenile-gen
 jgen -g chenile-service -o orders.json       # emit a sample input
 jgen -f orders.json                          # generate ./output/orders
 ```

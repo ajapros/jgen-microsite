@@ -13,6 +13,8 @@ that most blueprints share, including:
 - package segments: `com`, `company`, `org`
 - the Chenile package (`chenilePackage`) and version (`chenileVersion`)
 - a default service name, default version, and default destination folder
+- `gitRemoteProtocol`: `ssh` (default) or `https`, the style of GitHub remote JGen adds when it
+  [creates a Git repository](/authoring/#generating-a-git-repository-initgit)
 
 These config values are **merged into the runtime input map before template rendering**, so templates can
 reference both blueprint inputs and global defaults. You can supply your own config with `-c`, and interactive

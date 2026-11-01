@@ -33,12 +33,44 @@ and rule, with indexed paths for nested records.
 | `VERSION` | Letters, digits, dots, underscores and hyphens. |
 | `HTTP_URL` | An absolute HTTP or HTTPS URL with a host. |
 | `KAFKA_TOPIC` | 1–249 ASCII letters, digits, dots, underscores or hyphens; excludes `.` and `..`. |
+| `GITHUB_REPOSITORY` | `owner/repo`, e.g. `acme/jgen-terraform`. The owner has at most 39 letters, digits or single hyphens and does not start or end with a hyphen. The repository has 1–100 letters, digits, dots, underscores or hyphens, and is not `.` or `..`. |
+| `PATTERN` | Matches the field's own `pattern` (see [below](#your-own-format-pattern)). |
+
+A blueprint's `gitRepositoryField` must name a field with the `GITHUB_REPOSITORY` rule. That field's value becomes
+the generated repository's `origin` (see [Generating a Git repository](/authoring/#generating-a-git-repository-initgit)).
 
 Rule names are case-sensitive, and an unknown rule is a blueprint configuration error. Leaving `validation` out
 preserves the existing field-type validation. Destination checks and the `sinceVersion` runtime check still run
 independently. `required`, defaults, dropdown `validValues` and `visibleWhen` keep their meaning: hidden fields
 are skipped, absent optional values are accepted, and resolved values are validated. **Validation never rewrites
 a name to make it valid** — an invalid value fails rather than being silently corrected.
+
+## Your own format: `PATTERN`
+
+When no named rule fits a format that is specific to your blueprint, use `PATTERN` with a regular expression and
+a message:
+
+```json
+{
+  "name": "ticket",
+  "type": "STRING",
+  "validation": "PATTERN",
+  "pattern": "[A-Z]{2,5}-[0-9]+",
+  "patternMessage": "must look like ABC-123"
+}
+```
+
+- The **whole** value must match. Don't add `^` and `$`; a pattern that matches only part of the value fails.
+- `patternMessage` is required and is the error users (and AI models) see: `Field ticket must look like ABC-123`.
+  Write it as what a valid value looks like.
+- The pattern is checked when the blueprint is loaded. A missing pattern, a missing message, an invalid regular
+  expression, or a `pattern` on a field whose rule isn't `PATTERN` is a blueprint error, reported before anyone
+  uses it.
+- On a `MULTI_SELECT` field, each selected value must match.
+- Patterns use Java regular-expression syntax (`java.util.regex`).
+
+Prefer a named rule whenever one exists. If several blueprints need the same format, it should become a named
+rule in `jgen-base`, so the format and its message stay the same everywhere.
 
 ## Rules on nested records and multi-selects
 
@@ -98,7 +130,8 @@ the full list of errors.
 
 Put common scalar validation in these declarations. Leave relationship and domain-specific checks — process
 hierarchy, cron payload contracts, and the like — to the blueprint's init hook. To add a new shared rule, extend
-`ValidationType` and `InputValidation` in `jgen-base` and document its contract.
+`ValidationType`, `InputValidation.validate` and `InputValidation.describe` in `jgen-base` and document its
+contract. For a one-off format, use `PATTERN`.
 
 ## How the built-ins declare rules
 

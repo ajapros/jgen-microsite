@@ -37,8 +37,8 @@ permalink: /
     <div class="feature">
       <p class="fi">templates</p>
       <h3>Author by convention</h3>
-      <p>Mustache files, <code>__name__</code> path placeholders, <code>%%key=value%%</code> conditional folders
-         and <code>.filelist</code> multi-file outputs. Most behaviour lives in templates, not Java.</p>
+      <p>Mustache files, <code>__name__</code> path placeholders, <code>%%key=value%%</code> conditional folders,
+         <code>.filelist</code> multi-file outputs and <code>_DoT_</code> for dotfiles. Most behaviour lives in templates, not Java.</p>
     </div>
     <div class="feature">
       <p class="fi">validation</p>
@@ -63,9 +63,8 @@ permalink: /
 
 <section class="home-section" style="background:var(--soft);border-radius:var(--radius);">
   <h2>Thirty seconds to a service</h2>
-  <p class="sub">Build the CLI, emit an input contract, edit it, generate.</p>
-  <pre><code>git clone https://github.com/rajakolluru/chenile-gen.git &amp;&amp; cd chenile-gen
-make clean all &amp;&amp; source setpath.sh        # puts jgen on PATH
+  <p class="sub">Install the CLI, emit an input contract, edit it, generate.</p>
+  <pre><code>brew install ajapros/jgen-tap/jgen          # or: jbang app install jgen@rajakolluru/chenile-gen
 
 jgen -g chenile-service -o orders.json       # emit a sample input
 # edit orders.json: set service=orders, jpa=y ...

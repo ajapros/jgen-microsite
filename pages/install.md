@@ -2,24 +2,89 @@
 title: "Install & the CLI"
 eyebrow: "Getting started"
 permalink: /install/
-summary: "Build JGen, put it on your PATH, and learn the CLI flags and the interactive, file-based, and sample-emitting flows."
+summary: "Install JGen with Homebrew, JBang or a zip, add blueprint jars without a rebuild, and learn the CLI flags and flows."
 ---
 
-## Build and set up
+## Install
+
+JGen needs Java 25 or later. Pick one of these; none of them needs a build.
+
+**Homebrew (macOS, Linux)**
+
+```bash
+brew install ajapros/jgen-tap/jgen
+```
+
+Homebrew also installs OpenJDK if you don't have it.
+
+**JBang (macOS, Linux, Windows)**
+
+```bash
+jbang app install jgen@rajakolluru/chenile-gen
+```
+
+[JBang](https://www.jbang.dev/) downloads a Java runtime if it needs one, puts `jgen` on your PATH and always fetches
+the latest release. Run `jbang app install --force jgen@rajakolluru/chenile-gen` to upgrade.
+
+**Download the zip**
+
+Download `jgen-<version>.zip` from the
+[GitHub releases](https://github.com/rajakolluru/chenile-gen/releases), unzip it anywhere and add its `bin`
+folder to your PATH. It contains `bin/jgen` (and `bin/jgen.cmd` for Windows), `lib/jgen-cli.jar` and an empty
+`blueprints/` folder.
+
+Check the installation with `jgen --version`.
+
+**Tab completion.** Homebrew sets up completion for bash, zsh and fish. With JBang or the zip, enable it once:
+
+```bash
+echo 'source <(jgen --completion bash)' >> ~/.bashrc                    # bash
+echo 'source <(jgen --completion zsh)'  >> ~/.zshrc                     # zsh (after compinit)
+jgen --completion fish > ~/.config/fish/completions/jgen.fish           # fish
+```
+
+Tab then completes options, blueprint names after `-g` (installed blueprints, cached `github:` references and
+the `github:` prefix), JSON files after `-f` and `-c`, and folders after `-r` and `--into`.
+
+## Adding blueprints without a rebuild
+
+Every blueprint is a single jar, and JGen picks up blueprint jars from these folders at start-up:
+
+| Folder | Use |
+| --- | --- |
+| `~/.jgen/blueprints` | your own blueprints, for every JGen installation (also works with JBang) |
+| `<install>/blueprints` | blueprints shared by everyone using that installation (zip installs) |
+| `$JGEN_BLUEPRINTS` | extra folders, comma-separated, e.g. a team share or a CI cache |
+
+```bash
+mkdir -p ~/.jgen/blueprints
+cp target/bp-terraform-module-1.0.jar ~/.jgen/blueprints/
+jgen -g terraform-module            # available immediately
+```
+
+Use the plain jar that `mvn package` builds for the blueprint module. Don't shade JGen's own libraries into it.
+You can also skip the copying: `jgen -g github:owner/repo` fetches a blueprint from its GitHub release (see
+[Blueprints from the web](/remote-blueprints/)).
+See [Write your own blueprint](/authoring/) for building one.
+
+## Build from source
+
+Use this when you are working on JGen itself:
 
 ```bash
 git clone https://github.com/rajakolluru/chenile-gen.git && cd chenile-gen
-make clean all && source setpath.sh          # builds the modules, puts jgen and stm-cli on PATH
+make clean all && source setpath.sh          # builds the modules, puts jgen.sh and stm-cli on PATH
 ```
 
-`make all` builds the full multi-module Maven project and prepares the CLI wrapper script. The non-PATH
-equivalent of the `jgen` command is `chenile-gen/jgen/jgen-cli/bin/jgen.sh`, which finds the latest built
-`jgen-cli-*.jar` under `target/` and runs it with `java -jar`.
+The build also produces the distribution zip, `jgen/jgen-cli/target/jgen-cli-<version>-dist.zip`, which is
+what a release publishes. `jgen.sh` runs the latest `jgen-cli-*.jar` under `target/`.
 
 Generated projects build with `mvn install` (or `make build`); generated mini-monoliths run with `make run`
 (port 8080 by default).
 
 ## CLI options
+
+The complete reference is the [jgen(1) manual](/manual/), also installed as `man jgen`.
 
 | Flag | Meaning |
 | --- | --- |
@@ -30,6 +95,11 @@ Generated projects build with `mvn install` (or `make build`); generated mini-mo
 | `-o, --output-file` | Where to write the sample input JSON. |
 | `-r, --regenerate` | Re-cut a generated project with the current blueprint into a separate folder and classify every file (2.1.35; see [Regeneration](/regeneration/)). |
 | `--into` | With `-r`, the folder to regenerate into (default `<project>.regenerated`). |
+| `--blueprint` | With `-r`, regenerate with this blueprint (e.g. a newer `github:` reference). |
+| `--fetch` | Fetch, verify and cache a blueprint from GitHub and describe it ([Blueprints from the web](/remote-blueprints/)). |
+| `--trust` | Trust the blueprint sources used in this run without asking. |
+| `--offline` | Use only installed and cached blueprints. |
+| `--completion` | Print the completion script for `bash`, `zsh` or `fish`. |
 
 There are three ways to drive JGen.
 
