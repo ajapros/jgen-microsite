@@ -6,7 +6,8 @@ summary: "Every jgen option, mode, environment variable and file, in the style o
 ---
 
 <p>This is the manual page installed with JGen (<code>man jgen</code>). Its source is
-<code>jgen/jgen-cli/src/man/jgen.1.md</code> in the chenile-gen repository.</p>
+<code>jgen/jgen-cli/src/man/jgen.1.md</code> in the chenile-gen repository. It describes the current development
+version; features marked "since 2.1.36" are not in the 2.1.35 release.</p>
 
 {% raw %}
 <div class="manpage">
@@ -26,14 +27,14 @@ summary: "Every jgen option, mode, environment variable and file, in the style o
 <p>Template files ending in <em>.mustache</em> are rendered with Mustache. File and folder names carry further instructions:</p>
 <ul>
 <li><em>__name__</em> is replaced by an input value;</li>
-<li><em>_DoT_</em> becomes a dot, so <em>_DoT_gitignore</em> is generated as <em>.gitignore</em>;</li>
+<li><em>_DoT_</em> becomes a dot, so <em>_DoT_gitignore</em> is generated as <em>.gitignore</em> (since 2.1.36);</li>
 <li>a folder named <em>%%key=value%%</em> is kept only when the input matches;</li>
 <li>a <em>.filelist</em> file is split into several files;</li>
 <li>an empty folder named <em>%{{blueprint …}}</em> generates a child blueprint in its place.</li>
 </ul>
 <p>jgen ships with blueprints for Chenile services, workflow services, query modules, mini-monoliths, ecosystems, process deployments, interceptors, integration tests and new blueprints. It accepts other blueprints without a rebuild: from blueprint folders (see <strong>FILES</strong>) or straight from a GitHub release (see <strong>BLUEPRINT REFERENCES</strong>).</p>
 <p>Every input path (prompts, input files, the web portal, child blueprints) goes through the same validator. The validator reports every problem at once, before any file is written.</p>
-<p>A blueprint can ask jgen to make the generated project a local Git repository: when the input <strong>initGit</strong> is true, jgen runs <strong>git init</strong> (branch <strong>main</strong>), adds every file and makes one commit. If the blueprint names a <strong>GITHUB_REPOSITORY</strong> input as its <em>gitRepositoryField</em> and that input has a value, jgen adds it as the <strong>origin</strong> remote, using SSH, or HTTPS when the configuration sets <strong>gitRemoteProtocol</strong> to <strong>https</strong>. jgen never creates the GitHub repository and never pushes.</p>
+<p>Since 2.1.36, a blueprint can ask jgen to make the generated project a local Git repository: when the input <strong>initGit</strong> is true, jgen runs <strong>git init</strong> (branch <strong>main</strong>), adds every file and makes one commit. If the blueprint names a <strong>GITHUB_REPOSITORY</strong> input as its <em>gitRepositoryField</em> and that input has a value, jgen adds it as the <strong>origin</strong> remote, using SSH, or HTTPS when the configuration sets <strong>gitRemoteProtocol</strong> to <strong>https</strong>. jgen never creates the GitHub repository and never pushes.</p>
 <p>After generating, jgen writes a generation record into the project (see <strong>FILES</strong>). <strong>jgen -r</strong> uses it to regenerate the project with a newer blueprint and report what changed.</p>
 <h2 id="modes">MODES</h2>
 <p>jgen does one thing per run. When several mode options are given, the first of <strong>--fetch</strong>, <strong>-r</strong>, <strong>-g</strong> and <strong>-e</strong> wins. With none of them, jgen generates a project.</p>

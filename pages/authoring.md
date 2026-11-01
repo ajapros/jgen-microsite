@@ -36,7 +36,7 @@ jgen -g jgen-blueprint -o new-blueprint.json
 jgen -f new-blueprint.json
 ```
 
-`standaloneRepo` decides where the blueprint will live:
+`standaloneRepo` (2.1.36) decides where the blueprint will live:
 
 - **`y`: its own repository** (recommended for anything you will share). `./output/bp-invoice` is a
   self-contained Maven project:
@@ -183,6 +183,8 @@ Then inspect the output tree and iterate on the template folder and hook. The fa
 4. inspect the generated output tree after one run.
 
 ## Generating a Git repository: `initGit`
+
+<span class="pill">2.1.36</span>
 
 Any blueprint can have JGen turn the project it generates into a local Git repository. No code is needed.
 

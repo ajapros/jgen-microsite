@@ -35,12 +35,12 @@ The `processors` flow runs these processors, in this sequence:
 | 7 | `file-template-executor` | Renders every `.mustache` file to its destination file. |
 | 8 | `file-splitter` | Breaks every `.filelist` file into multiple files. |
 | 9 | `file-name-replacer` | Replaces `__name__` placeholders in file and folder names from the map. |
-| 9a | `dot-replacer` | Turns every `_DoT_` in file and folder names into a dot: `_DoT_gitignore` becomes `.gitignore` (see [Template reference](/template-conventions/#_dot_--dots-in-names)). |
+| 9a | `dot-replacer` | (2.1.36) Turns every `_DoT_` in file and folder names into a dot: `_DoT_gitignore` becomes `.gitignore` (see [Template reference](/template-conventions/#_dot_--dots-in-names)). |
 | 10 | `conditional-processor` | Processes `%%key=value%%` folders: promote on match, discard otherwise. |
 | 11 | `blueprint-expander` | Expands surviving child markers (`%{{…}}`) through their own pipelines — see [Aggregated blueprints](/aggregated-blueprints/). |
 | 12 | `post-process-executor` | Runs the blueprint's **post-process hook** for custom destination-folder logic, after all children. |
 | 13 | `provenance-writer` | Writes `.jgen/generation.json`: blueprint, config, inputs and a hash of every generated file. Top-level generations only. |
-| 14 | `git-initializer` | With `initGit` true: makes the project a local Git repository with one commit, and adds the blueprint's `gitRepositoryField` value as `origin` (see [Generating a Git repository](/authoring/#generating-a-git-repository-initgit)). Top-level generations only. |
+| 14 | `git-initializer` | (2.1.36) With `initGit` true: makes the project a local Git repository with one commit, and adds the blueprint's `gitRepositoryField` value as `origin` (see [Generating a Git repository](/authoring/#generating-a-git-repository-initgit)). Top-level generations only. |
 | 15 | `final-executor` | Runs the blueprint's **final hook**, last: for work outside the file tree. Top-level generations only. |
 
 > The engine resolves config, then validates version, then validates inputs — all **before** the init hook runs

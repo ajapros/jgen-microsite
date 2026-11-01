@@ -118,6 +118,8 @@ recursively.
 
 ## `_DoT_` — dots in names
 
+<span class="pill">2.1.36</span>
+
 Every `_DoT_` in a file or folder name is replaced by a dot. Use it whenever the generated project needs a dotfile
 or dot-folder:
 

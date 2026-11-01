@@ -33,8 +33,8 @@ and rule, with indexed paths for nested records.
 | `VERSION` | Letters, digits, dots, underscores and hyphens. |
 | `HTTP_URL` | An absolute HTTP or HTTPS URL with a host. |
 | `KAFKA_TOPIC` | 1–249 ASCII letters, digits, dots, underscores or hyphens; excludes `.` and `..`. |
-| `GITHUB_REPOSITORY` | `owner/repo`, e.g. `acme/jgen-terraform`. The owner has at most 39 letters, digits or single hyphens and does not start or end with a hyphen. The repository has 1–100 letters, digits, dots, underscores or hyphens, and is not `.` or `..`. |
-| `PATTERN` | Matches the field's own `pattern` (see [below](#your-own-format-pattern)). |
+| `GITHUB_REPOSITORY` (2.1.36) | `owner/repo`, e.g. `acme/jgen-terraform`. The owner has at most 39 letters, digits or single hyphens and does not start or end with a hyphen. The repository has 1–100 letters, digits, dots, underscores or hyphens, and is not `.` or `..`. |
+| `PATTERN` (2.1.36) | Matches the field's own `pattern` (see [below](#your-own-format-pattern)). |
 
 A blueprint's `gitRepositoryField` must name a field with the `GITHUB_REPOSITORY` rule. That field's value becomes
 the generated repository's `origin` (see [Generating a Git repository](/authoring/#generating-a-git-repository-initgit)).
@@ -46,6 +46,8 @@ are skipped, absent optional values are accepted, and resolved values are valida
 a name to make it valid** — an invalid value fails rather than being silently corrected.
 
 ## Your own format: `PATTERN`
+
+<span class="pill">2.1.36</span>
 
 When no named rule fits a format that is specific to your blueprint, use `PATTERN` with a regular expression and
 a message:
