@@ -20,6 +20,7 @@ version; features marked "since 2.1.36" are not in the 2.1.35 release.</p>
 <p><strong>jgen</strong> <strong>-e</strong> <em>config-file</em></p>
 <p><strong>jgen</strong> <strong>-r</strong> <em>project</em> [<strong>--into</strong> <em>folder</em>] [<strong>--blueprint</strong> <em>blueprint</em>] [<strong>-c</strong> <em>config</em>] [<strong>--trust</strong>] [<strong>--offline</strong>]</p>
 <p><strong>jgen</strong> <strong>--fetch</strong> <em>reference</em> [<strong>--trust</strong>] [<strong>--offline</strong>]</p>
+<p><strong>jgen</strong> <strong>--search</strong> [<em>text</em>] [<strong>--offline</strong>]</p>
 <p><strong>jgen</strong> <strong>--completion</strong> <em>shell</em></p>
 <p><strong>jgen</strong> <strong>-h</strong> | <strong>-V</strong></p>
 <h2 id="description">DESCRIPTION</h2>
@@ -96,6 +97,9 @@ version; features marked "since 2.1.36" are not in the 2.1.35 release.</p>
 <dt><strong>--fetch</strong> <em>reference</em></dt>
 <dd>Fetch the blueprint at <em>reference</em>, verify it and cache it. jgen prints its name, description, exact source and SHA-256, and the <strong>-g</strong> command to use it.
 </dd>
+<dt><strong>--search</strong> [<em>text</em>]</dt>
+<dd>Search the blueprint catalogs (see <strong>CATALOGS</strong>) for entries whose name, description or tags contain <em>text</em>; without <em>text</em>, list every entry. Each result shows <em>catalog</em>/<em>name</em>, its description, source and tags.
+</dd>
 <dt><strong>--trust</strong></dt>
 <dd>Trust every blueprint source used in this run without asking. Use this in scripts and CI only for sources you have reviewed. Prefer listing them in <em>settings.json</em> (see <strong>FILES</strong>).
 </dd>
@@ -113,23 +117,27 @@ version; features marked "since 2.1.36" are not in the 2.1.35 release.</p>
 </dd>
 </dl>
 <h2 id="blueprint-references">BLUEPRINT REFERENCES</h2>
-<p>A blueprint is named either by its installed name (for example <strong>chenile-service</strong>) or by a reference:</p>
+<p>A blueprint is named by its installed name (for example <strong>chenile-service</strong>), by a catalog name (see <strong>CATALOGS</strong>) or by a reference:</p>
 <p><strong>github:</strong><em>owner</em>/<em>repo</em>[/<em>name</em>][@<em>version</em>][#sha256:<em>hex</em>]</p>
 <dl>
 <dt><em>owner/repo</em></dt>
-<dd>The GitHub repository. Its release must carry exactly one blueprint jar, or exactly one named <em>repo-*.jar</em>. Jars ending in <em>-sources</em>, <em>-javadoc</em> and <em>-tests</em> are ignored.
+<dd>The GitHub repository. If its release carries a blueprint jar (exactly one, or exactly one named <em>repo-*.jar</em>; <em>-sources</em>, <em>-javadoc</em> and <em>-tests</em> jars are ignored), jgen uses the jar. Otherwise, or when the tag has no release, jgen uses the repository’s source archive at that tag as a <em>template-only</em> blueprint (since 2.1.36). A template-only blueprint is laid out like a jar’s resources (<em>src/main/resources/META-INF/blueprint.json</em> and its template folder) and may not declare an init hook.
 </dd>
 <dt><em>name</em></dt>
 <dd>Which blueprint to use, when the jar contains several.
 </dd>
 <dt><em>version</em></dt>
-<dd>A release tag. Without it, jgen uses the latest release (or, with <strong>--offline</strong>, the newest cached one).
+<dd>A release tag. Without it, jgen uses the latest release, or else the highest version tag (or, with <strong>--offline</strong>, the newest cached one).
 </dd>
 <dt><em>hex</em></dt>
-<dd>The expected SHA-256 of the jar, as 64 hexadecimal digits. A mismatch is an error. Pinning is recommended in scripts and CI.
+<dd>The expected SHA-256, as 64 hexadecimal digits: of the jar, or, for a template-only blueprint, of its files. A mismatch is an error. Pinning is recommended in scripts and CI.
 </dd>
 </dl>
+<p>A local folder holding a template-only blueprint is named with <strong>dir:</strong><em>folder</em> (since 2.1.36). The folder may be the blueprint’s repository or its <em>src/main/resources</em>. It is not cached, locked or trust-checked, so edits apply on the next run.</p>
 <p>Installed blueprints always take precedence. A fetched blueprint whose name is already taken by an installed one is refused.</p>
+<h2 id="catalogs">CATALOGS</h2>
+<p>Since 2.1.36, a short name that is not installed is looked up in blueprint catalogs: [<em>catalog</em>/]<em>name</em>[@<em>version</em>]. jgen searches the official catalog (<strong>github:ajapros/jgen-catalog</strong>) first, then the catalogs listed in <em>settings.json</em>, and uses the first match. <em>catalog</em> (the catalog’s alias) picks one catalog; <em>version</em> picks a version, otherwise the latest. The entry’s source is then fetched like any <strong>github:</strong> reference, and a version the catalog pins to a SHA-256 is checked.</p>
+<p>Sources listed in the official catalog are trusted. Sources from other catalogs are trusted only if the catalog is marked <strong>trusted</strong> in <em>settings.json</em>; otherwise jgen asks as usual. Catalogs are cached for an hour; when GitHub cannot be reached, or with <strong>--offline</strong>, the cached copy is used.</p>
 <h2 id="trust">TRUST</h2>
 <p>A blueprint can contain Java code, which runs with your permissions. jgen therefore:</p>
 <ul>
@@ -191,7 +199,10 @@ version; features marked "since 2.1.36" are not in the 2.1.35 release.</p>
 <dd>Blueprint jars shared by everyone using this installation.
 </dd>
 <dt><em>~/.jgen/settings.json</em></dt>
-<dd><strong>trustedSources</strong>: a list of trusted blueprint sources, each <strong>github:</strong><em>owner</em>/* or <strong>github:</strong><em>owner</em>/<em>repo</em>.
+<dd><strong>trustedSources</strong>: a list of trusted blueprint sources, each <strong>github:</strong><em>owner</em>/* or <strong>github:</strong><em>owner</em>/<em>repo</em>. <strong>catalogs</strong>: further catalogs, each with <strong>source</strong> (<strong>github:</strong><em>owner</em>/<em>repo</em>), <strong>alias</strong> and <strong>trusted</strong>. <strong>officialCatalog</strong>: <strong>false</strong> to stop searching the official catalog.
+</dd>
+<dt><em>~/.jgen/cache/catalogs/</em></dt>
+<dd>Cached catalogs.
 </dd>
 <dt><em>~/.jgen/blueprints.lock.json</em></dt>
 <dd>The SHA-256 first seen for each fetched blueprint version.
@@ -233,6 +244,13 @@ jgen -f tf.json --trust</code></pre>
 <p>Start a new blueprint in its own Git repository, ready to push (set <strong>standaloneRepo</strong> to <strong>y</strong> in the input):</p>
 <pre><code>jgen -g jgen-blueprint -o new-blueprint.json
 jgen -f new-blueprint.json</code></pre>
+<p>Find a blueprint in the catalogs and use it by name:</p>
+<pre><code>jgen --search terraform
+jgen -g terraform@1.2.0 -o tf.json</code></pre>
+<p>Write a template-only blueprint and try it from its folder, then use it from GitHub once tagged:</p>
+<pre><code>jgen -g dir:./jgen-terraform -o tf.json
+jgen -f tf.json
+jgen -g github:acme/jgen-terraform@0.1.0 -o tf.json</code></pre>
 <p>Install a blueprint jar of your own:</p>
 <pre><code>cp target/bp-docs-site-1.0.jar ~/.jgen/blueprints/
 jgen -g docs-site -o docs.json</code></pre>

@@ -160,6 +160,9 @@ get yours there.
   jar to `~/.jgen/blueprints` (or the installation's `blueprints/` folder, or a folder listed in
   `JGEN_BLUEPRINTS`). An installed JGen picks it up on its next run. See
   [Adding blueprints without a rebuild](/install/#adding-blueprints-without-a-rebuild).
+- **Template-only, straight from a repository (2.1.36).** If the blueprint has no init hook, it needs no jar:
+  push a version tag and use it as `github:owner/repo@tag`, or try it locally as `dir:<folder>`. See
+  [template-only blueprints](/remote-blueprints/#template-only-blueprints).
 - **Publish it on GitHub.** With `standaloneRepo` = `y` this is already set up: push the local repository, then
   push a version tag and the generated workflow attaches the jar to a release. Anyone can then use it as
   `github:owner/repo@version`. See [Blueprints from the web](/remote-blueprints/).

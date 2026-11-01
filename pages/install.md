@@ -99,6 +99,7 @@ The complete reference is the [jgen(1) manual](/manual/), also installed as `man
 | `--fetch` | Fetch, verify and cache a blueprint from GitHub and describe it ([Blueprints from the web](/remote-blueprints/)). |
 | `--trust` | Trust the blueprint sources used in this run without asking. |
 | `--offline` | Use only installed and cached blueprints. |
+| `--search [TEXT]` | Search the [blueprint catalogs](/catalogs/) by name, description or tag (2.1.36). |
 | `--completion` | Print the completion script for `bash`, `zsh` or `fish`. |
 
 There are three ways to drive JGen.

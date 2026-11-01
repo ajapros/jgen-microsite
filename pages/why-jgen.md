@@ -192,7 +192,7 @@ compares how you *write* a generator; the second compares what happens when you 
 
 | | Templates from the web | Running someone else's code | What the project remembers | Updating a generated project | Git repository |
 |---|---|---|---|---|---|
-| **JGen** | `github:owner/repo@version` (a release jar); or drop a jar in a folder | trusted sources only, others asked first; SHA-256 locked on first use and optionally pinned; each blueprint in its own class loader | `.jgen/generation.json`: blueprint and version, config, inputs, copies of input files, a hash of every generated file | regenerates alongside and classifies every file (`jgen -r`); merging left to git or an agent | opt-in per blueprint: `git init`, one commit, GitHub `origin` set; never creates or pushes |
+| **JGen** | short names from [catalogs](/catalogs/) (`jgen -g terraform`, `jgen --search`); `github:owner/repo@version`: a release jar, or for template-only blueprints the repository itself at a tag; `dir:` for a local folder; or drop a jar in a folder | trusted sources only, others asked first; SHA-256 locked on first use and optionally pinned; each blueprint in its own class loader | `.jgen/generation.json`: blueprint and version, config, inputs, copies of input files, a hash of every generated file | regenerates alongside and classifies every file (`jgen -r`); merging left to git or an agent | opt-in per blueprint: `git init`, one commit, GitHub `origin` set; never creates or pushes |
 | Cookiecutter | any git URL, `gh:` shorthand, zip or folder | runs the template's hooks | nothing in the project (a replay file in your home folder) | no (the separate *cruft* tool adds it) | no |
 | Copier | any git URL or `gh:` shorthand | tasks and extensions need `--trust` or a trusted-template setting | `.copier-answers.yml`: answers and template version | **yes**, `copier update` merges newer template versions | no |
 | Yeoman | npm packages | npm's trust model | `.yo-rc.json` configuration | no | some generators do |
@@ -212,9 +212,10 @@ A few notes, in fairness to the others:
   measurements that cut it, and `jgen -r` re-cuts it with the current blueprint and classifies every file (safe
   update, keep yours, conflict, new, delete). The merge is left to `git`, a person or an AI agent, which is where
   merging is now best done. If you want the tool itself to merge, Copier is the stronger choice.
-- **Cookiecutter and Copier take any repository as a template.** JGen needs a published blueprint jar when the
-  blueprint has Java hooks. In return you get a versioned, testable artefact and a hash JGen can check. Template-only
-  blueprints straight from a repository are on the roadmap.
+- **Cookiecutter and Copier take any repository as a template.** So does JGen, for template-only blueprints: a
+  tagged repository laid out like a jar's resources is enough. A blueprint with Java hooks still needs a published
+  jar, which gives you a versioned, testable artefact and a hash JGen can check. Unlike the others, JGen checks trust
+  and locks a content hash even for templates.
 - **Backstage goes all the way to GitHub.** Its scaffolder creates the repository and pushes, because it is a
   hosted platform with your organisation's credentials. JGen stops at a local repository with `origin` set, so it
   never acts on your account.
@@ -236,10 +237,11 @@ Nx to get this. JGen is a lightweight command-line tool with no platform to run.
 
 - It does not merge blueprint changes into an existing project itself; it regenerates alongside and reports
   ([regeneration](/regeneration/)).
-- There is no catalogue of blueprints yet: you find one by its repository name, or by the GitHub topic
-  `jgen-blueprint`. Catalogues are the next step on the [roadmap](/remote-blueprints/#later-phases).
-- The flip side of one-jar packaging: writing a blueprint means a small Maven build, even if the output is pure
-  YAML, and hooks are written in Java. (Using JGen needs no build: install it with Homebrew or JBang.)
+- The [catalogue](/catalogs/) is new and small. Cookiecutter and Yeoman have thousands of community templates;
+  for most stacks you will still be writing your own blueprints.
+- Hooks are written in Java, and a blueprint with hooks is published as a jar, which means a small Maven build. A
+  blueprint without hooks needs neither: it is used straight from its repository. (Using JGen needs no build:
+  install it with Homebrew or JBang.)
 - The community is small compared with Cookiecutter's or Yeoman's, so you will be writing more of your own
   blueprints than downloading them.
 

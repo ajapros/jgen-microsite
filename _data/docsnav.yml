@@ -16,6 +16,8 @@
       url: "/regeneration/"
     - title: "Blueprints from the web"
       url: "/remote-blueprints/"
+    - title: "Blueprint catalogs"
+      url: "/catalogs/"
 
 - section: "Blueprints"
   items:
