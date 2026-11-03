@@ -72,8 +72,22 @@ See [Write your own blueprint](/authoring/) for building one.
 
 `stm-cli`, the command-line tool for Chenile state machine definitions (diagrams, allowed actions, test cases),
 installs from the same tap: `brew install ajapros/jgen-tap/stm-cli`. It has its own repository,
-[rajakolluru/stm-cli](https://github.com/rajakolluru/stm-cli), and its own releases. It is no longer built
+[ajapros/stm-cli](https://github.com/ajapros/stm-cli), and its own releases. It is no longer built
 by chenile-gen's `make all`.
+
+## Using JGen with Claude
+
+The [Chenile plugin for Claude](https://github.com/ajapros/chenile-claude-plugins) includes a `chenile-jgen`
+skill that covers every blueprint, the template markup, hooks, extensions and catalogs. With it, Claude runs
+`jgen -g <blueprint> -o input.json` and `jgen -f input.json` for you instead of writing the code by hand. In Claude
+Code:
+
+```text
+/plugin marketplace add ajapros/chenile-claude-plugins
+/plugin install chenile@chenile-plugins
+```
+
+See [Building Chenile with Claude](https://chenile.org/developer/claude/) for claude.ai and team setups.
 
 ## Build from source
 

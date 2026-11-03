@@ -19,7 +19,7 @@ number; from **2.5.1** on, JGen has its own.
   Chenile version JGen was built with.
 - **Maven coordinates:** from 2.5.1, JGen's libraries are published as `org.chenile.jgen:jgen-base` and
   `org.chenile.jgen:jgen-ext-pebble`. Standalone blueprints and extensions compile against these.
-- **stm-cli** is versioned and released separately too: see [stm-cli](https://github.com/rajakolluru/stm-cli).
+- **stm-cli** is versioned and released separately too: see [stm-cli](https://github.com/ajapros/stm-cli).
 
 | JGen | Built with Chenile | Generates Chenile (default) | Maven group | Status |
 | --- | --- | --- | --- | --- |

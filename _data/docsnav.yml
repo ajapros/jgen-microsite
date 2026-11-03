@@ -10,6 +10,8 @@
       url: "/install/"
     - title: "Releases &amp; versions"
       url: "/releases/"
+    - title: "Using JGen with Claude"
+      url: "/install/#using-jgen-with-claude"
     - title: "jgen(1) manual"
       url: "/manual/"
     - title: "Configuration &amp; versions"
